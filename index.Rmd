@@ -1,0 +1,75 @@
+---
+title: "Asignment 3 Gurung"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidyverse)
+library(reshape2)
+library(maps)
+library(ggplot2)
+library(knitr)
+source("analysis.R")
+
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+<p>For my own interests and because I am a representative of Asian Americans and Pacific Islanders group I decided to focus on them for this assignment. I wondered how the number of incarcerations of AAPI members who are considered the *model minority* would be in a place like Washington where there are counties full of Asian Americans and Pacific Islanders. The variable I chose to focus on was aapi_pop_15to64</p>
+
+<p> To explore this variable which stood for the population of Asian Americans and Pacific Islanders in incarceration I found it helpful to have the total population of incarcerations. This let me calculate multiple values that could help me understand the data better. First I was able to find the average number of WA AAPI incarcerations by county in 2018 (14795) and 1990 (3641). I also found the ratios of AAPI incarcerations to Total population in 2018 (11.6%) compared to 1990 (4.4%). Lastly I found the highest number of incarcerations was in King County which isn't surprising but the number was well above what I expected as it was **340132** in 2018!<p>
+
+## Charts
+
+```{r chart1, echo=FALSE}
+aapiVstotalWA <- ggplot(yearly_dataWA,aes(x = year, y = Population))+
+  geom_line(aes(color= Aapi_vs_total))+
+  scale_color_manual(values = c("red", "blue"))+
+  labs(title = "Total AAPI vs Total Population in WA over time", color="Different Populations")
+aapiVstotalWA
+```
+```{r chart2, echo=FALSE}
+aapiWA <- ggplot(data_aapi,aes(x = total_pop_15to64, y = aapi_pop_15to64))+
+  geom_point()+
+  labs(title = "AAPI vs Population")
+aapiWA
+
+aapiWAver2 <- ggplot(data_aapiver2,aes(x = total_pop_15to64, y = aapi_pop_15to64))+
+  geom_point()+
+  labs(title = "AAPI vs Population in WA Version 2")+
+  xlim(0,200000)+
+  ylim(0,20000)
+aapiWAver2
+```
+```{r map, echo=FALSE}
+#this code was from my TA! she showed us how to make the map look a bit better.
+blank_theme <- theme_bw() +
+  theme(
+    axis.line = element_blank(), # remove axis lines
+    axis.text = element_blank(), # remove axis labels
+    axis.ticks = element_blank(), # remove axis ticks
+    axis.title = element_blank(), # remove axis titles
+    plot.background = element_blank(), # remove gray background
+    panel.grid.major = element_blank(), # remove major grid lines
+    panel.grid.minor = element_blank(), # remove minor grid lines
+    panel.border = element_blank() # remove border around plot
+  )
+
+aapiWA_map <- ggplot(map_data) + 
+  geom_polygon(
+    mapping = aes(x = long, y = lat, group = group, fill = aapi_pop_15to64),
+    color="grey", size = .5
+  ) + 
+  coord_map() + 
+  scale_fill_continuous(limits = c(0, max(map_data$aapi_pop_15to64)),low="white", high="blue") + 
+  blank_theme +
+  ggtitle("AAPI incarcerations WA 2018")
+aapiWA_map
+
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
